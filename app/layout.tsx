@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 
@@ -37,9 +38,16 @@ export default function RootLayout({
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
             <Link
               href="/"
-              className="font-display text-xl font-semibold tracking-tight"
+              className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight"
             >
-              🌍 TripScale <span className="text-primary">Stories</span>
+              <Image
+                src="/tripscale-logo.png"
+                alt="TripScale"
+                width={71}
+                height={32}
+                priority
+              />
+              <span className="text-primary">Stories</span>
             </Link>
             <nav className="flex items-center gap-5 text-sm font-medium">
               <Link
