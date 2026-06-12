@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
+/* Palette matched to www.tripscale.ai */
 :root {
-  --background: #faf6ef; /* warm cream */
-  --foreground: #21302b; /* deep pine ink */
+  --background: #f7f9fc; /* cool light blue-gray */
+  --foreground: #081b46; /* deep navy ink */
   --card: #ffffff;
-  --card-foreground: #21302b;
-  --muted: #f0e9dc;
-  --muted-foreground: #68705f;
-  --primary: #e0633f; /* sunset coral */
-  --primary-foreground: #fff8f3;
-  --secondary: #1f4d44; /* deep teal */
-  --secondary-foreground: #f2efe7;
-  --border: #e5dcc9;
-  --ring: #e0633f;
+  --card-foreground: #081b46;
+  --muted: #e9eff7;
+  --muted-foreground: #5e6b85;
+  --primary: #2f7dff; /* tripscale blue */
+  --primary-foreground: #ffffff;
+  --secondary: #081b46; /* deep navy */
+  --secondary-foreground: #f7f9fc;
+  --accent: #22c7d7; /* tripscale cyan */
+  --border: #d9e3ee;
+  --ring: #2f7dff;
 }
 
 @theme inline {
@@ -26,6 +28,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
   --color-border: var(--border);
   --color-ring: var(--ring);
 
@@ -36,7 +39,7 @@
   --radius-xl: 1.5rem;
 
   --shadow-card:
-    0 1px 2px rgb(33 48 43 / 0.06), 0 10px 28px -14px rgb(33 48 43 / 0.22);
+    0 1px 2px rgb(8 27 70 / 0.06), 0 10px 28px -14px rgb(8 27 70 / 0.22);
 }
 
 body {
