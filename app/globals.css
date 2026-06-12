@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf6ef; /* warm cream */
+  --foreground: #21302b; /* deep pine ink */
+  --card: #ffffff;
+  --card-foreground: #21302b;
+  --muted: #f0e9dc;
+  --muted-foreground: #68705f;
+  --primary: #e0633f; /* sunset coral */
+  --primary-foreground: #fff8f3;
+  --secondary: #1f4d44; /* deep teal */
+  --secondary-foreground: #f2efe7;
+  --border: #e5dcc9;
+  --ring: #e0633f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-card:
+    0 1px 2px rgb(33 48 43 / 0.06), 0 10px 28px -14px rgb(33 48 43 / 0.22);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
