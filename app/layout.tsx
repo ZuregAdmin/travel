@@ -43,8 +43,8 @@ export default function RootLayout({
               <Image
                 src="/tripscale-logo.png"
                 alt="TripScale"
-                width={71}
-                height={32}
+                width={107}
+                height={48}
                 priority
               />
               <span className="text-primary">Stories</span>
