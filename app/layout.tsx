@@ -35,19 +35,19 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
             <Link
               href="/"
-              className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight"
+              className="flex items-center gap-1.5 font-display font-semibold tracking-tight"
             >
               <Image
                 src="/tripscale-logo.png"
                 alt="TripScale"
-                width={107}
-                height={48}
+                width={129}
+                height={58}
                 priority
               />
-              <span className="text-primary">Stories</span>
+              <span className="text-2xl text-primary">Stories</span>
             </Link>
             <nav className="flex items-center gap-5 text-sm font-medium">
               <Link
