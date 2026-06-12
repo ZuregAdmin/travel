@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { CountryExplorer } from "@/components/country-explorer";
 import { TripCard } from "@/components/trip-card";
+import { WorldMap, type MapCountryInfo } from "@/components/world-map";
 import { COUNTRIES } from "@/lib/countries";
 import { approvedTrips } from "@/lib/store";
+import { getWorldPaths, MAP_HEIGHT, MAP_WIDTH } from "@/lib/worldmap";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,12 @@ export default async function Home() {
 
   const countriesVisited = tripsPerCountry.size;
   const recent = trips.slice(0, 6);
+
+  const mapPaths = getWorldPaths();
+  const mapInfo: Record<string, MapCountryInfo> = {};
+  for (const c of countries) {
+    mapInfo[c.code] = { name: c.name, flag: c.flag, trips: c.trips };
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -96,6 +104,18 @@ export default async function Home() {
         <p className="mb-6 text-muted-foreground">
           Pick a destination to read trips from travelers who’ve been there.
         </p>
+        <div className="mb-10 rounded-xl border border-border bg-card p-4 shadow-card sm:p-6">
+          <WorldMap
+            paths={mapPaths}
+            info={mapInfo}
+            width={MAP_WIDTH}
+            height={MAP_HEIGHT}
+          />
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            Coral countries have trips — click any country to open its page.
+            Small island nations are easier to find in the list below.
+          </p>
+        </div>
         <CountryExplorer countries={countries} />
       </section>
     </div>
