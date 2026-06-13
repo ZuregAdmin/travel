@@ -1,85 +1,129 @@
-import { promises as fs } from "fs";
-import path from "path";
+import { pool } from "./db";
 import { deletePhoto, putPhoto } from "./s3";
-import type { Trip, TripStatus } from "./types";
+import type { Trip, TripPhoto, TripStatus } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const TRIPS_FILE = path.join(DATA_DIR, "trips.json");
+// Trip metadata lives in RDS (Aurora PostgreSQL); photo bytes live in S3.
+// Public API is unchanged from the previous file-backed store so callers
+// (pages, server actions) need no changes.
 
-async function ensureDataDir(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+interface TripRow {
+  id: string;
+  status: TripStatus;
+  country: string;
+  city: string;
+  author: string;
+  title: string;
+  story: string;
+  goals: string;
+  total_spent: number;
+  photos: TripPhoto[];
+  created_at: Date;
+  reviewed_at: Date | null;
 }
+
+function rowToTrip(r: TripRow): Trip {
+  return {
+    id: r.id,
+    status: r.status,
+    country: r.country,
+    city: r.city,
+    author: r.author,
+    title: r.title,
+    story: r.story,
+    goals: r.goals,
+    totalSpent: r.total_spent,
+    photos: r.photos,
+    createdAt: r.created_at.toISOString(),
+    ...(r.reviewed_at ? { reviewedAt: r.reviewed_at.toISOString() } : {}),
+  };
+}
+
+const SELECT = `
+  SELECT id, status, country, city, author, title, story, goals,
+         total_spent, photos, created_at, reviewed_at
+  FROM trips`;
 
 export async function readTrips(): Promise<Trip[]> {
-  try {
-    const raw = await fs.readFile(TRIPS_FILE, "utf8");
-    return JSON.parse(raw) as Trip[];
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return [];
-    throw err;
-  }
-}
-
-async function writeTrips(trips: Trip[]): Promise<void> {
-  await ensureDataDir();
-  const tmp = TRIPS_FILE + ".tmp";
-  await fs.writeFile(tmp, JSON.stringify(trips, null, 2), "utf8");
-  await fs.rename(tmp, TRIPS_FILE);
+  const { rows } = await pool.query<TripRow>(`${SELECT} ORDER BY created_at DESC`);
+  return rows.map(rowToTrip);
 }
 
 export async function addTrip(trip: Trip): Promise<void> {
-  const trips = await readTrips();
-  trips.push(trip);
-  await writeTrips(trips);
+  await pool.query(
+    `INSERT INTO trips
+       (id, status, country, city, author, title, story, goals,
+        total_spent, photos, created_at, reviewed_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [
+      trip.id,
+      trip.status,
+      trip.country,
+      trip.city,
+      trip.author,
+      trip.title,
+      trip.story,
+      trip.goals,
+      trip.totalSpent,
+      JSON.stringify(trip.photos),
+      trip.createdAt,
+      trip.reviewedAt ?? null,
+    ]
+  );
 }
 
 export async function setTripStatus(
   id: string,
   status: TripStatus
 ): Promise<void> {
-  const trips = await readTrips();
-  const trip = trips.find((t) => t.id === id);
-  if (!trip) return;
-  trip.status = status;
-  trip.reviewedAt = new Date().toISOString();
-  await writeTrips(trips);
+  await pool.query(
+    `UPDATE trips SET status = $2, reviewed_at = $3 WHERE id = $1`,
+    [id, status, new Date().toISOString()]
+  );
 }
 
 export async function deleteTrip(id: string): Promise<void> {
-  const trips = await readTrips();
-  const trip = trips.find((t) => t.id === id);
+  const trip = await getTrip(id);
   if (!trip) return;
   for (const photo of trip.photos) {
     await deletePhoto(photo.file).catch(() => {
       // Photo already gone or S3 unreachable; metadata removal still proceeds.
     });
   }
-  await writeTrips(trips.filter((t) => t.id !== id));
+  await pool.query(`DELETE FROM trips WHERE id = $1`, [id]);
 }
 
 export async function getTrip(id: string): Promise<Trip | undefined> {
-  const trips = await readTrips();
-  return trips.find((t) => t.id === id);
-}
-
-function newestFirst(a: Trip, b: Trip): number {
-  return b.createdAt.localeCompare(a.createdAt);
+  const { rows } = await pool.query<TripRow>(`${SELECT} WHERE id = $1`, [id]);
+  return rows[0] ? rowToTrip(rows[0]) : undefined;
 }
 
 export async function approvedTrips(): Promise<Trip[]> {
-  return (await readTrips()).filter((t) => t.status === "approved").sort(newestFirst);
+  const { rows } = await pool.query<TripRow>(
+    `${SELECT} WHERE status = 'approved' ORDER BY created_at DESC`
+  );
+  return rows.map(rowToTrip);
 }
 
 export async function approvedTripsByCountry(code: string): Promise<Trip[]> {
-  return (await approvedTrips()).filter((t) => t.country === code);
+  const { rows } = await pool.query<TripRow>(
+    `${SELECT} WHERE status = 'approved' AND country = $1 ORDER BY created_at DESC`,
+    [code]
+  );
+  return rows.map(rowToTrip);
 }
 
 export async function pendingTrips(): Promise<Trip[]> {
-  return (await readTrips()).filter((t) => t.status === "pending").sort(newestFirst);
+  const { rows } = await pool.query<TripRow>(
+    `${SELECT} WHERE status = 'pending' ORDER BY created_at DESC`
+  );
+  return rows.map(rowToTrip);
 }
 
 export async function rejectedTrips(): Promise<Trip[]> {
-  return (await readTrips()).filter((t) => t.status === "rejected").sort(newestFirst);
+  const { rows } = await pool.query<TripRow>(
+    `${SELECT} WHERE status = 'rejected' ORDER BY created_at DESC`
+  );
+  return rows.map(rowToTrip);
 }
 
 export async function savePhoto(
