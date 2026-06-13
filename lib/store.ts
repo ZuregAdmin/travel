@@ -1,13 +1,13 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { deletePhoto, putPhoto } from "./s3";
 import type { Trip, TripStatus } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const TRIPS_FILE = path.join(DATA_DIR, "trips.json");
-export const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 
-async function ensureDirs(): Promise<void> {
-  await fs.mkdir(UPLOADS_DIR, { recursive: true });
+async function ensureDataDir(): Promise<void> {
+  await fs.mkdir(DATA_DIR, { recursive: true });
 }
 
 export async function readTrips(): Promise<Trip[]> {
@@ -21,7 +21,7 @@ export async function readTrips(): Promise<Trip[]> {
 }
 
 async function writeTrips(trips: Trip[]): Promise<void> {
-  await ensureDirs();
+  await ensureDataDir();
   const tmp = TRIPS_FILE + ".tmp";
   await fs.writeFile(tmp, JSON.stringify(trips, null, 2), "utf8");
   await fs.rename(tmp, TRIPS_FILE);
@@ -50,11 +50,9 @@ export async function deleteTrip(id: string): Promise<void> {
   const trip = trips.find((t) => t.id === id);
   if (!trip) return;
   for (const photo of trip.photos) {
-    await fs
-      .unlink(path.join(UPLOADS_DIR, path.basename(photo.file)))
-      .catch(() => {
-        // Photo already gone; nothing to clean up.
-      });
+    await deletePhoto(photo.file).catch(() => {
+      // Photo already gone or S3 unreachable; metadata removal still proceeds.
+    });
   }
   await writeTrips(trips.filter((t) => t.id !== id));
 }
@@ -84,7 +82,10 @@ export async function rejectedTrips(): Promise<Trip[]> {
   return (await readTrips()).filter((t) => t.status === "rejected").sort(newestFirst);
 }
 
-export async function savePhoto(name: string, bytes: Buffer): Promise<void> {
-  await ensureDirs();
-  await fs.writeFile(path.join(UPLOADS_DIR, path.basename(name)), bytes);
+export async function savePhoto(
+  name: string,
+  bytes: Buffer,
+  contentType: string
+): Promise<void> {
+  await putPhoto(name, bytes, contentType);
 }

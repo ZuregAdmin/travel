@@ -48,7 +48,7 @@ export async function submitTrip(
 
   const id = randomUUID();
   const photos: TripPhoto[] = [];
-  const saves: { name: string; bytes: Buffer }[] = [];
+  const saves: { name: string; bytes: Buffer; contentType: string }[] = [];
 
   for (let i = 0; i < MAX_PHOTOS; i++) {
     const file = formData.get(`photo-${i}`);
@@ -70,7 +70,11 @@ export async function submitTrip(
     }
 
     const name = `${id}-${i}.${ext}`;
-    saves.push({ name, bytes: Buffer.from(await file.arrayBuffer()) });
+    saves.push({
+      name,
+      bytes: Buffer.from(await file.arrayBuffer()),
+      contentType: file.type,
+    });
     photos.push({ file: name, category });
   }
 
@@ -79,7 +83,7 @@ export async function submitTrip(
   }
 
   for (const save of saves) {
-    await savePhoto(save.name, save.bytes);
+    await savePhoto(save.name, save.bytes, save.contentType);
   }
 
   await addTrip({
