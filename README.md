@@ -7,7 +7,7 @@ User-submitted travel blogs and photos, organized by country. Built with Next.js
 - **Home** — country index for every country in the world (searchable, filterable by continent), latest approved trips, and a **Submit your trip** button.
 - **`/countries/[code]`** — one page per country showing all approved trips there.
 - **`/trips/[id]`** — a trip page: photos (each tagged travel / food / activities / accommodations / scenery), the story, trip goals, and total spent in USD excluding souvenirs.
-- **`/submit`** — submission form: country + city, 1–4 photos with categories, story, goals, budget. Submissions land in a pending queue, not on the site.
+- **`/submit`** — submission form: country + city, 1–8 photos with categories, story, goals, budget. Submissions land in a pending queue, not on the site.
 - **`/admin`** — password-protected review queue. Approve, reject, remove, or permanently delete submissions. Only approved trips are publicly visible.
 
 ## Running it

@@ -10,7 +10,7 @@ import {
   type TripPhoto,
 } from "@/lib/types";
 
-const MAX_PHOTOS = 4;
+const MAX_PHOTOS = 8;
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
 const EXT_BY_MIME: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -79,7 +79,7 @@ export async function submitTrip(
   }
 
   if (photos.length === 0) {
-    return { error: "Add at least one photo (up to 4)." };
+    return { error: "Add at least one photo (up to 8)." };
   }
 
   for (const save of saves) {

@@ -108,14 +108,14 @@ export function SubmitForm({ countries }: { countries: CountryOption[] }) {
 
       <div>
         <p className="mb-1 text-sm font-medium">
-          Photos <span className="text-muted-foreground">(1–4, each tagged with a category)</span>
+          Photos <span className="text-muted-foreground">(1–8, each tagged with a category)</span>
         </p>
         <p className="mb-3 text-xs text-muted-foreground">
           Categories: travel, food, activities, accommodations, scenery. JPEG,
           PNG, or WebP, up to 8 MB each.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
-          {[0, 1, 2, 3].map((i) => (
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
             <PhotoSlot key={i} index={i} />
           ))}
         </div>
