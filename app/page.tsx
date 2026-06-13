@@ -58,7 +58,7 @@ export default async function Home() {
             Explore countries
           </Link>
         </div>
-        <div className="mt-10 flex items-center justify-center gap-10 text-sm text-muted-foreground">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5 text-sm text-muted-foreground sm:gap-x-10">
           <p>
             <span className="block font-display text-3xl font-semibold text-foreground">
               {trips.length}

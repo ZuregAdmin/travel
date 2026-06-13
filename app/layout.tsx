@@ -35,7 +35,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-          <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-20 sm:px-6">
             <Link
               href="/"
               className="flex items-center gap-1.5 font-display font-semibold tracking-tight"
@@ -46,22 +46,23 @@ export default function RootLayout({
                 width={213}
                 height={96}
                 priority
-                className="h-[52px] w-[184px] object-cover drop-shadow-[0_10px_24px_#2f7dff24]"
+                className="h-10 w-[142px] object-cover drop-shadow-[0_10px_24px_#2f7dff24] sm:h-[52px] sm:w-[184px]"
               />
-              <span className="text-2xl text-primary">Stories</span>
+              <span className="text-lg text-primary sm:text-2xl">Stories</span>
             </Link>
-            <nav className="flex items-center gap-5 text-sm font-medium">
+            <nav className="flex items-center gap-3 text-sm font-medium sm:gap-5">
               <Link
                 href="/#countries"
-                className="transition-colors hover:text-primary"
+                className="hidden transition-colors hover:text-primary sm:inline"
               >
                 Countries
               </Link>
               <Link
                 href="/submit"
-                className="rounded-full bg-primary px-4 py-2 text-primary-foreground transition-opacity hover:opacity-90"
+                className="rounded-full bg-primary px-3.5 py-2 text-primary-foreground transition-opacity hover:opacity-90 sm:px-4"
               >
-                Share your trip
+                <span className="sm:hidden">Share trip</span>
+                <span className="hidden sm:inline">Share your trip</span>
               </Link>
             </nav>
           </div>
