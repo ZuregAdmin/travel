@@ -57,8 +57,15 @@ function createPool(): Pool {
   });
 }
 
-// Reuse a single Pool across requests, and across Next.js dev hot-reloads
-// (which would otherwise leak a new Pool on every edit).
+// Lazily create the Pool on first query — never at import time. This keeps the
+// build (which imports these modules to collect page data) from needing a
+// database or env vars, and avoids opening a connection during static analysis.
+// The instance is reused across requests, and across Next.js dev hot-reloads.
 const globalForDb = globalThis as unknown as { __tsPool?: Pool };
-export const pool: Pool = globalForDb.__tsPool ?? createPool();
-if (process.env.NODE_ENV !== "production") globalForDb.__tsPool = pool;
+
+export function getPool(): Pool {
+  if (globalForDb.__tsPool) return globalForDb.__tsPool;
+  const created = createPool();
+  if (process.env.NODE_ENV !== "production") globalForDb.__tsPool = created;
+  return created;
+}

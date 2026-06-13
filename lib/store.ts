@@ -1,4 +1,4 @@
-import { pool } from "./db";
+import { getPool } from "./db";
 import { deletePhoto, putPhoto } from "./s3";
 import type { Trip, TripPhoto, TripStatus } from "./types";
 
@@ -44,12 +44,12 @@ const SELECT = `
   FROM trips`;
 
 export async function readTrips(): Promise<Trip[]> {
-  const { rows } = await pool.query<TripRow>(`${SELECT} ORDER BY created_at DESC`);
+  const { rows } = await getPool().query<TripRow>(`${SELECT} ORDER BY created_at DESC`);
   return rows.map(rowToTrip);
 }
 
 export async function addTrip(trip: Trip): Promise<void> {
-  await pool.query(
+  await getPool().query(
     `INSERT INTO trips
        (id, status, country, city, author, title, story, goals,
         total_spent, photos, created_at, reviewed_at)
@@ -75,7 +75,7 @@ export async function setTripStatus(
   id: string,
   status: TripStatus
 ): Promise<void> {
-  await pool.query(
+  await getPool().query(
     `UPDATE trips SET status = $2, reviewed_at = $3 WHERE id = $1`,
     [id, status, new Date().toISOString()]
   );
@@ -89,23 +89,23 @@ export async function deleteTrip(id: string): Promise<void> {
       // Photo already gone or S3 unreachable; metadata removal still proceeds.
     });
   }
-  await pool.query(`DELETE FROM trips WHERE id = $1`, [id]);
+  await getPool().query(`DELETE FROM trips WHERE id = $1`, [id]);
 }
 
 export async function getTrip(id: string): Promise<Trip | undefined> {
-  const { rows } = await pool.query<TripRow>(`${SELECT} WHERE id = $1`, [id]);
+  const { rows } = await getPool().query<TripRow>(`${SELECT} WHERE id = $1`, [id]);
   return rows[0] ? rowToTrip(rows[0]) : undefined;
 }
 
 export async function approvedTrips(): Promise<Trip[]> {
-  const { rows } = await pool.query<TripRow>(
+  const { rows } = await getPool().query<TripRow>(
     `${SELECT} WHERE status = 'approved' ORDER BY created_at DESC`
   );
   return rows.map(rowToTrip);
 }
 
 export async function approvedTripsByCountry(code: string): Promise<Trip[]> {
-  const { rows } = await pool.query<TripRow>(
+  const { rows } = await getPool().query<TripRow>(
     `${SELECT} WHERE status = 'approved' AND country = $1 ORDER BY created_at DESC`,
     [code]
   );
@@ -113,14 +113,14 @@ export async function approvedTripsByCountry(code: string): Promise<Trip[]> {
 }
 
 export async function pendingTrips(): Promise<Trip[]> {
-  const { rows } = await pool.query<TripRow>(
+  const { rows } = await getPool().query<TripRow>(
     `${SELECT} WHERE status = 'pending' ORDER BY created_at DESC`
   );
   return rows.map(rowToTrip);
 }
 
 export async function rejectedTrips(): Promise<Trip[]> {
-  const { rows } = await pool.query<TripRow>(
+  const { rows } = await getPool().query<TripRow>(
     `${SELECT} WHERE status = 'rejected' ORDER BY created_at DESC`
   );
   return rows.map(rowToTrip);
