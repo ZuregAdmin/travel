@@ -1,4 +1,4 @@
-// Applies db/schema.sql to DATABASE_URL, then migrates data/trips.json (if any).
+// Applies db/schema.sql to Supabase, then migrates data/trips.json (if any).
 // Idempotent. Run with env loaded:
 //
 //   node --env-file=.env scripts/db-apply.mjs

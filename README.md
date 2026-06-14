@@ -27,6 +27,23 @@ If unset, it defaults to `changeme` — fine for local dev, change it before dep
 
 ## Storage
 
-No database. Trips live in `data/trips.json` and uploaded photos in `data/uploads/` (both gitignored). Photos are served through `/api/photos/[name]`. The store layer is isolated in `lib/store.ts`, so swapping in a real database later only touches that file.
+Trip metadata lives in Supabase Postgres. Uploaded photo bytes live in S3, while
+the Supabase `trips.photos` column stores each photo's S3 key and category.
 
-The repo ships with no data; sample seed data may exist locally in `data/`. Delete the `data/` directory to start clean.
+Copy `.env.example` to `.env` and set `DATABASE_URL` to the Supabase transaction
+pooler connection string from **Project Settings → Database → Connection
+string**. Keep this value server-only.
+
+Apply the schema and migrate any existing `data/trips.json` records:
+
+```bash
+pnpm db:apply
+```
+
+Check the configured database connection:
+
+```bash
+pnpm db:check
+```
+
+The schema is in `db/schema.sql`. Both setup commands are idempotent.

@@ -2,7 +2,7 @@ import { getPool } from "./db";
 import { deletePhoto, putPhoto } from "./s3";
 import type { Trip, TripPhoto, TripStatus } from "./types";
 
-// Trip metadata lives in RDS (Aurora PostgreSQL); photo bytes live in S3.
+// Trip metadata lives in Supabase Postgres; photo bytes live in S3.
 // Public API is unchanged from the previous file-backed store so callers
 // (pages, server actions) need no changes.
 

@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:apply": "node --env-file=.env scripts/db-apply.mjs",
+    "db:check": "node --env-file=.env scripts/db-check.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1068.0",
