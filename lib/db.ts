@@ -12,7 +12,9 @@ function createPool(): Pool {
   return new Pool({
     connectionString: DATABASE_URL,
     ssl: { rejectUnauthorized: false },
-    max: 5,
+    // Keep each serverless instance's footprint small; the Supabase transaction
+    // pooler multiplexes many clients onto few Postgres connections.
+    max: 3,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
   });
@@ -21,12 +23,13 @@ function createPool(): Pool {
 // Lazily create the Pool on first query — never at import time. This keeps the
 // build (which imports these modules to collect page data) from needing a
 // database or env vars, and avoids opening a connection during static analysis.
-// The instance is reused across requests, and across Next.js dev hot-reloads.
+// The instance is memoized on globalThis so it is reused across requests, across
+// every getPool() call within a request, and across Next.js dev hot-reloads.
+// (Memoizing in production too is essential — otherwise each call would open a
+// new Pool and quickly exhaust the connection pooler.)
 const globalForDb = globalThis as unknown as { __tsPool?: Pool };
 
 export function getPool(): Pool {
-  if (globalForDb.__tsPool) return globalForDb.__tsPool;
-  const created = createPool();
-  if (process.env.NODE_ENV !== "production") globalForDb.__tsPool = created;
-  return created;
+  if (!globalForDb.__tsPool) globalForDb.__tsPool = createPool();
+  return globalForDb.__tsPool;
 }
