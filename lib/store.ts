@@ -43,17 +43,34 @@ const SELECT = `
          total_spent, photos, created_at, reviewed_at
   FROM trips`;
 
+export interface SubmissionConsent {
+  submitterEmail: string;
+  consentedAt: string;
+  termsVersion: string;
+  attestations: {
+    ageConfirmed: true;
+    rightsConfirmed: true;
+    privacyConfirmed: true;
+    termsConfirmed: true;
+    communityConfirmed: true;
+  };
+}
+
 export async function readTrips(): Promise<Trip[]> {
   const { rows } = await getPool().query<TripRow>(`${SELECT} ORDER BY created_at DESC`);
   return rows.map(rowToTrip);
 }
 
-export async function addTrip(trip: Trip): Promise<void> {
+export async function addTrip(
+  trip: Trip,
+  consent: SubmissionConsent
+): Promise<void> {
   await getPool().query(
     `INSERT INTO trips
        (id, status, country, city, author, title, story, goals,
-        total_spent, photos, created_at, reviewed_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        total_spent, photos, created_at, reviewed_at, submitter_email,
+        consented_at, terms_version, attestations)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
     [
       trip.id,
       trip.status,
@@ -67,6 +84,10 @@ export async function addTrip(trip: Trip): Promise<void> {
       JSON.stringify(trip.photos),
       trip.createdAt,
       trip.reviewedAt ?? null,
+      consent.submitterEmail,
+      consent.consentedAt,
+      consent.termsVersion,
+      JSON.stringify(consent.attestations),
     ]
   );
 }
@@ -132,4 +153,8 @@ export async function savePhoto(
   contentType: string
 ): Promise<void> {
   await putPhoto(name, bytes, contentType);
+}
+
+export async function removePhoto(name: string): Promise<void> {
+  await deletePhoto(name);
 }

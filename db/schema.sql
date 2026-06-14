@@ -13,8 +13,17 @@ CREATE TABLE IF NOT EXISTS trips (
   total_spent integer     NOT NULL,            -- USD, excludes souvenirs
   photos      jsonb       NOT NULL DEFAULT '[]'::jsonb,
   created_at  timestamptz NOT NULL,
-  reviewed_at timestamptz
+  reviewed_at timestamptz,
+  submitter_email text,
+  consented_at timestamptz,
+  terms_version text,
+  attestations jsonb
 );
+
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS submitter_email text;
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS consented_at timestamptz;
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS terms_version text;
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS attestations jsonb;
 
 -- Public listings filter by status (newest first); country pages add country.
 CREATE INDEX IF NOT EXISTS trips_status_created_idx ON trips (status, created_at DESC);

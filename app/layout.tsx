@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import { legalContactEmail } from "@/lib/legal";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -28,6 +29,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contactEmail = legalContactEmail();
+
   return (
     <html
       lang="en"
@@ -69,11 +72,42 @@ export default function RootLayout({
         </header>
         <main className="flex-1">{children}</main>
         <footer className="mt-16 border-t border-border">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-8 text-sm text-muted-foreground sm:px-6">
-            <p>© {new Date().getFullYear()} TripScale Stories</p>
-            <Link href="/admin" className="transition-colors hover:text-foreground">
-              Admin
-            </Link>
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:px-6">
+            <nav
+              aria-label="Legal and support"
+              className="flex flex-wrap gap-x-5 gap-y-2"
+            >
+              <Link href="/privacy" className="hover:text-foreground">
+                Privacy
+              </Link>
+              <Link href="/terms" className="hover:text-foreground">
+                Terms
+              </Link>
+              <Link
+                href="/community-guidelines"
+                className="hover:text-foreground"
+              >
+                Community Guidelines
+              </Link>
+              <Link href="/copyright" className="hover:text-foreground">
+                Copyright &amp; Takedowns
+              </Link>
+              <a
+                href={`mailto:${contactEmail}`}
+                className="hover:text-foreground"
+              >
+                Contact
+              </a>
+            </nav>
+            <div className="flex items-center justify-between gap-4">
+              <p>© {new Date().getFullYear()} TripScale Stories</p>
+              <Link
+                href="/admin"
+                className="transition-colors hover:text-foreground"
+              >
+                Admin
+              </Link>
+            </div>
           </div>
         </footer>
       </body>

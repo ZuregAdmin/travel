@@ -2,7 +2,13 @@ import Link from "next/link";
 
 export const metadata = { title: "Submitted" };
 
-export default function ThanksPage() {
+interface Props {
+  searchParams: Promise<{ reference?: string }>;
+}
+
+export default async function ThanksPage({ searchParams }: Props) {
+  const { reference } = await searchParams;
+
   return (
     <div className="mx-auto max-w-xl px-4 py-24 text-center sm:px-6">
       <p className="text-5xl">🧳</p>
@@ -13,6 +19,16 @@ export default function ThanksPage() {
         We review every submission before it goes live. Once approved, your
         story and photos will appear on the country page for everyone to
         explore.
+      </p>
+      {reference && (
+        <p className="mt-4 rounded-lg border border-border bg-card px-4 py-3 text-sm">
+          Submission reference:{" "}
+          <strong className="break-all font-mono">{reference}</strong>
+        </p>
+      )}
+      <p className="mt-3 text-sm text-muted-foreground">
+        Keep the reference above if you may need to request a correction or
+        deletion later.
       </p>
       <div className="mt-8 flex justify-center gap-3">
         <Link

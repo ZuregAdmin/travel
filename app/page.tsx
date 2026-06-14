@@ -22,7 +22,7 @@ export default async function Home() {
   }));
 
   const countriesVisited = tripsPerCountry.size;
-  const recent = trips.slice(0, 6);
+  const recent = trips.slice(0, 3);
 
   const mapPaths = getWorldPaths();
   const mapInfo: Record<string, MapCountryInfo> = {};

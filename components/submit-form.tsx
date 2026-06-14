@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { submitTrip, type SubmitState } from "@/app/submit/actions";
 import { PHOTO_CATEGORIES, PHOTO_CATEGORY_LABELS } from "@/lib/types";
@@ -74,8 +75,26 @@ export function SubmitForm({ countries }: { countries: CountryOption[] }) {
     <form action={formAction} className="flex flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="mb-1.5 block text-sm font-medium">Your name</span>
+          <span className="mb-1.5 block text-sm font-medium">
+            Public display name
+          </span>
           <input name="author" required maxLength={80} className={inputClass} />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium">
+            Contact email
+          </span>
+          <input
+            name="submitterEmail"
+            type="email"
+            required
+            maxLength={254}
+            autoComplete="email"
+            className={inputClass}
+          />
+          <span className="mt-1 block text-xs text-muted-foreground">
+            Private. Used only for moderation, rights, and privacy requests.
+          </span>
         </label>
         <label className="block">
           <span className="mb-1.5 block text-sm font-medium">Trip title</span>
@@ -112,7 +131,8 @@ export function SubmitForm({ countries }: { countries: CountryOption[] }) {
         </p>
         <p className="mb-3 text-xs text-muted-foreground">
           Categories: travel, food, activities, accommodations, scenery. JPEG,
-          PNG, or WebP, up to 8 MB each.
+          PNG, or WebP, up to 8 MB each. We re-encode uploads to remove embedded
+          metadata such as GPS coordinates.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -165,6 +185,99 @@ export function SubmitForm({ countries }: { countries: CountryOption[] }) {
         />
       </label>
 
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="font-display text-xl font-semibold">
+          Submission agreements
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Do not include home addresses, booking numbers, passport details,
+          financial information, or other sensitive personal information.
+        </p>
+        <div className="mt-4 flex flex-col gap-3 text-sm">
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              name="ageConfirmed"
+              required
+              className="mt-1 size-4 shrink-0 accent-primary"
+            />
+            <span>I confirm that I am at least 18 years old.</span>
+          </label>
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              name="rightsConfirmed"
+              required
+              className="mt-1 size-4 shrink-0 accent-primary"
+            />
+            <span>
+              I created this story and these photos, or I have permission to
+              publish them. I also have permission from identifiable people
+              shown, including a parent or guardian for any minor.
+            </span>
+          </label>
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              name="communityConfirmed"
+              required
+              className="mt-1 size-4 shrink-0 accent-primary"
+            />
+            <span>
+              My submission follows the{" "}
+              <Link
+                href="/community-guidelines"
+                target="_blank"
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                Community Guidelines
+              </Link>
+              .
+            </span>
+          </label>
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              name="privacyConfirmed"
+              required
+              className="mt-1 size-4 shrink-0 accent-primary"
+            />
+            <span>
+              I have read the{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                Privacy Notice
+              </Link>
+              , including how public submissions and private contact details
+              are handled.
+            </span>
+          </label>
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              name="termsConfirmed"
+              required
+              className="mt-1 size-4 shrink-0 accent-primary"
+            />
+            <span>
+              I agree to the{" "}
+              <Link
+                href="/terms"
+                target="_blank"
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                Terms of Use
+              </Link>
+              , including the license needed to display and promote my
+              submission.
+            </span>
+          </label>
+        </div>
+      </div>
+
       {state.error && (
         <p className="rounded-lg border border-primary/40 bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
           {state.error}
@@ -180,7 +293,7 @@ export function SubmitForm({ countries }: { countries: CountryOption[] }) {
           {pending ? "Submitting…" : "Submit for review"}
         </button>
         <p className="text-xs text-muted-foreground">
-          Submissions are reviewed before they appear on the site.
+          Submissions are moderated and may be rejected or removed.
         </p>
       </div>
     </form>

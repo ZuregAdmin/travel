@@ -47,3 +47,10 @@ pnpm db:check
 ```
 
 The schema is in `db/schema.sql`. Both setup commands are idempotent.
+
+## Compliance operations
+
+The submission flow records versioned consent, keeps contact email private,
+requires rights and age attestations, and strips embedded image metadata.
+Review [COMPLIANCE.md](./COMPLIANCE.md) before launch for the operational steps
+that code and policy pages cannot perform automatically.
